@@ -4,7 +4,7 @@ import os
 from flask import Flask, jsonify
 from werkzeug.exceptions import HTTPException
 
-__version__ = "1.0.0"
+__version__ = "3.0.0"
 
 
 def create_app(test_config=None):
@@ -18,6 +18,8 @@ def create_app(test_config=None):
         DATABASE=os.environ.get(
             "ACEEST_DB", os.path.join(app.instance_path, "aceest_fitness.db")
         ),
+        ADMIN_PASSWORD=os.environ.get("ACEEST_ADMIN_PASSWORD", "admin"),
+        PASSWORD_HASH_METHOD="scrypt",
     )
     if test_config:
         app.config.update(test_config)
@@ -29,9 +31,11 @@ def create_app(test_config=None):
     from . import db
     db.init_app(app)
 
-    from . import clients, programs
+    from . import auth, clients, programs, tracking
+    app.register_blueprint(auth.bp)
     app.register_blueprint(programs.bp)
     app.register_blueprint(clients.bp)
+    app.register_blueprint(tracking.bp)
 
     @app.get("/")
     def index():

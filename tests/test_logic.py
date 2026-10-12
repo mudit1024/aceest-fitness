@@ -79,3 +79,9 @@ def test_membership_state():
     assert logic.membership_state("2026-01-09", today) == {
         "status": "Expired", "days_remaining": 0}
     assert logic.membership_state(None, today)["status"] == "No end date"
+
+
+def test_average_adherence():
+    assert logic.average_adherence([80, 90, 100]) == 90.0
+    assert logic.average_adherence([]) is None
+    assert logic.average_adherence(iter([33, 34])) == 33.5

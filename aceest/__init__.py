@@ -26,6 +26,9 @@ def create_app(test_config=None):
     if db_dir:
         os.makedirs(db_dir, exist_ok=True)
 
+    from . import db
+    db.init_app(app)
+
     from . import programs
     app.register_blueprint(programs.bp)
 

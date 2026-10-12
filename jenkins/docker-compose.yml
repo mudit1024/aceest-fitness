@@ -1,0 +1,22 @@
+# Local Jenkins for the ACEest BUILD stage.
+#   docker compose -f jenkins/docker-compose.yml up -d --build
+# Then open http://localhost:8080
+services:
+  jenkins:
+    build: .
+    image: aceest-jenkins
+    container_name: aceest-jenkins
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      # Lets pipeline 'docker' commands use the host's Docker engine.
+      - /var/run/docker.sock:/var/run/docker.sock
+    # The socket is owned by root:root on Docker Desktop; joining group 0
+    # gives the jenkins user access without running Jenkins as root.
+    group_add:
+      - "0"
+
+volumes:
+  jenkins_home:

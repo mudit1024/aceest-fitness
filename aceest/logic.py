@@ -3,6 +3,7 @@
 Nothing in this module touches Flask or the database, so it can be unit
 tested directly.
 """
+import random
 from datetime import date
 
 
@@ -123,3 +124,18 @@ def average_adherence(values):
     if not values:
         return None
     return round(sum(values) / len(values), 1)
+
+
+# Plan templates used by the programme generator in legacy v3.2.4
+PROGRAM_TEMPLATES = {
+    "FL": ["Full Body HIIT", "Circuit Training", "Cardio + Weights"],
+    "MG": ["Push/Pull/Legs", "Upper/Lower Split", "Full Body Strength"],
+    "BG": ["Full Body 3x/week", "Light Strength + Mobility"],
+}
+
+
+def generate_program(rng=None):
+    """Pick a random programme and plan; pass ``rng`` for reproducible output."""
+    rng = rng or random.Random()
+    code = rng.choice(sorted(PROGRAM_TEMPLATES))
+    return {"program": code, "plan": rng.choice(PROGRAM_TEMPLATES[code])}

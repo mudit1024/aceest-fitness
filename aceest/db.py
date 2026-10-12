@@ -5,8 +5,15 @@ One connection per request is stored on ``flask.g`` and closed on teardown.
 import sqlite3
 
 from flask import current_app, g
+from werkzeug.security import generate_password_hash
 
 SCHEMA = """
+CREATE TABLE IF NOT EXISTS users (
+    username       TEXT PRIMARY KEY,
+    password_hash  TEXT NOT NULL,
+    role           TEXT NOT NULL DEFAULT 'Trainer'
+);
+
 CREATE TABLE IF NOT EXISTS clients (
     id                INTEGER PRIMARY KEY AUTOINCREMENT,
     name              TEXT UNIQUE NOT NULL,
@@ -76,6 +83,15 @@ def init_db():
     """Create tables if they do not exist yet (idempotent)."""
     conn = get_db()
     conn.executescript(SCHEMA)
+    # Seed a default admin (as the legacy app did), but store a hash, not plain text.
+    if conn.execute("SELECT 1 FROM users WHERE username = 'admin'").fetchone() is None:
+        conn.execute(
+            "INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)",
+            ("admin", generate_password_hash(
+                current_app.config["ADMIN_PASSWORD"],
+                method=current_app.config["PASSWORD_HASH_METHOD"],
+            ), "Admin"),
+        )
     conn.commit()
 
 

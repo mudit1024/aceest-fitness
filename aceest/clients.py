@@ -5,7 +5,7 @@ from flask import Blueprint, abort, jsonify, url_for
 
 from .db import get_db
 from .logic import (
-    bmi_category, calculate_bmi, calculate_calories, get_program,
+    bmi_category, calculate_bmi, calculate_calories, generate_program, get_program,
     membership_state,
 )
 from .validation import iso_date, json_body, number, reject_unknown, text
@@ -138,3 +138,19 @@ def client_membership(name):
     client = find_client(name)
     state = membership_state(client["membership_end"])
     return jsonify(client=name, membership_end=client["membership_end"], **state)
+
+
+@bp.post("/<name>/program/generate")
+def generate_client_program(name):
+    """Assign a randomly generated programme and plan to the client."""
+    client = find_client(name)
+    generated = generate_program()
+    fields = with_calories({"program": generated["program"]}, client)
+    assignments = ", ".join(f"{col} = ?" for col in fields)
+    conn = get_db()
+    conn.execute(
+        f"UPDATE clients SET {assignments} WHERE id = ?",
+        (*fields.values(), client["id"]),
+    )
+    conn.commit()
+    return jsonify(client=name, **generated, calories=fields.get("calories"))

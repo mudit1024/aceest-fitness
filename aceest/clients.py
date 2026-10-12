@@ -1,14 +1,14 @@
 """Client management endpoints."""
 import sqlite3
-from datetime import date
 
-from flask import Blueprint, abort, jsonify, request, url_for
+from flask import Blueprint, abort, jsonify, url_for
 
 from .db import get_db
 from .logic import (
     bmi_category, calculate_bmi, calculate_calories, get_program,
     membership_state,
 )
+from .validation import iso_date, json_body, number, reject_unknown, text
 
 bp = Blueprint("clients", __name__, url_prefix="/clients")
 
@@ -23,13 +23,6 @@ NUMERIC_FIELDS = {
 UPDATABLE_FIELDS = set(NUMERIC_FIELDS) | {"program", "membership_end"}
 
 
-def json_body():
-    data = request.get_json(silent=True)
-    if not isinstance(data, dict):
-        abort(400, description="Request body must be a JSON object")
-    return data
-
-
 def find_client(name):
     """Return the client row for ``name`` or abort with 404."""
     row = get_db().execute(
@@ -42,28 +35,12 @@ def find_client(name):
 
 def validate_client(data, creating):
     """Validate a create/update payload and return the cleaned fields."""
-    allowed = UPDATABLE_FIELDS | ({"name"} if creating else set())
-    unknown = set(data) - allowed
-    if unknown:
-        abort(400, description=f"Unknown field(s): {', '.join(sorted(unknown))}")
+    reject_unknown(data, UPDATABLE_FIELDS | ({"name"} if creating else set()))
 
-    clean = {}
-    if creating:
-        name = data.get("name")
-        if not isinstance(name, str) or not name.strip():
-            abort(400, description="'name' is required")
-        clean["name"] = name.strip()
-
+    clean = {"name": text(data, "name")} if creating else {}
     for field, (kind, low, high) in NUMERIC_FIELDS.items():
-        if field not in data:
-            continue
-        value = data[field]
-        numeric = (int,) if kind is int else (int, float)
-        if isinstance(value, bool) or not isinstance(value, numeric):
-            abort(400, description=f"'{field}' must be {'an integer' if kind is int else 'a number'}")
-        if not low <= value <= high:
-            abort(400, description=f"'{field}' must be between {low} and {high}")
-        clean[field] = value
+        if field in data:
+            clean[field] = number(data, field, kind, low, high)
 
     if "program" in data:
         program = get_program(data["program"])
@@ -72,11 +49,7 @@ def validate_client(data, creating):
         clean["program"] = program["code"]
 
     if "membership_end" in data:
-        try:
-            clean["membership_end"] = date.fromisoformat(str(data["membership_end"])).isoformat()
-        except ValueError:
-            abort(400, description="'membership_end' must be a date in YYYY-MM-DD format")
-
+        clean["membership_end"] = iso_date(data, "membership_end")
     return clean
 
 

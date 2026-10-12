@@ -127,9 +127,10 @@ def get_client(name):
 @bp.route("/<name>", methods=["PUT", "PATCH"])
 def update_client(name):
     existing = find_client(name)
-    fields = with_calories(validate_client(json_body(), creating=False), existing)
+    fields = validate_client(json_body(), creating=False)
     if not fields:
         abort(400, description="No fields to update")
+    fields = with_calories(fields, existing)
     assignments = ", ".join(f"{col} = ?" for col in fields)
     conn = get_db()
     conn.execute(

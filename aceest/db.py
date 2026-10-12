@@ -20,6 +20,40 @@ CREATE TABLE IF NOT EXISTS clients (
     membership_status TEXT NOT NULL DEFAULT 'Active',
     membership_end    TEXT
 );
+
+CREATE TABLE IF NOT EXISTS progress (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    client_id  INTEGER NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+    week       TEXT NOT NULL,
+    adherence  INTEGER NOT NULL CHECK (adherence BETWEEN 0 AND 100)
+);
+
+CREATE TABLE IF NOT EXISTS workouts (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    client_id     INTEGER NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+    date          TEXT NOT NULL,
+    workout_type  TEXT NOT NULL,
+    duration_min  INTEGER NOT NULL,
+    notes         TEXT
+);
+
+CREATE TABLE IF NOT EXISTS exercises (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    workout_id  INTEGER NOT NULL REFERENCES workouts(id) ON DELETE CASCADE,
+    name        TEXT NOT NULL,
+    sets        INTEGER NOT NULL,
+    reps        INTEGER NOT NULL,
+    weight      REAL
+);
+
+CREATE TABLE IF NOT EXISTS metrics (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    client_id  INTEGER NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+    date       TEXT NOT NULL,
+    weight     REAL,
+    waist      REAL,
+    bodyfat    REAL
+);
 """
 
 

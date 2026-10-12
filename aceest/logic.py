@@ -112,3 +112,14 @@ def membership_state(membership_end, today=None):
         "status": "Active" if days >= 0 else "Expired",
         "days_remaining": max(days, 0),
     }
+
+
+WORKOUT_TYPES = ("Strength", "Hypertrophy", "Cardio", "Mobility")
+
+
+def average_adherence(values):
+    """Mean adherence percentage rounded to one decimal, or None if empty."""
+    values = list(values)
+    if not values:
+        return None
+    return round(sum(values) / len(values), 1)

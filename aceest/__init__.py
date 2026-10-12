@@ -29,9 +29,10 @@ def create_app(test_config=None):
     from . import db
     db.init_app(app)
 
-    from . import clients, programs
+    from . import clients, programs, tracking
     app.register_blueprint(programs.bp)
     app.register_blueprint(clients.bp)
+    app.register_blueprint(tracking.bp)
 
     @app.get("/")
     def index():

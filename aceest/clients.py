@@ -5,7 +5,10 @@ from datetime import date
 from flask import Blueprint, abort, jsonify, request, url_for
 
 from .db import get_db
-from .logic import calculate_calories, get_program
+from .logic import (
+    bmi_category, calculate_bmi, calculate_calories, get_program,
+    membership_state,
+)
 
 bp = Blueprint("clients", __name__, url_prefix="/clients")
 
@@ -144,3 +147,20 @@ def delete_client(name):
     conn.execute("DELETE FROM clients WHERE id = ?", (client["id"],))
     conn.commit()
     return jsonify(deleted=name)
+
+
+@bp.get("/<name>/bmi")
+def client_bmi(name):
+    client = find_client(name)
+    if not client["weight"] or not client["height"]:
+        abort(422, description="Client needs both weight and height to calculate BMI")
+    bmi = calculate_bmi(client["weight"], client["height"])
+    category, risk = bmi_category(bmi)
+    return jsonify(client=name, bmi=bmi, category=category, risk=risk)
+
+
+@bp.get("/<name>/membership")
+def client_membership(name):
+    client = find_client(name)
+    state = membership_state(client["membership_end"])
+    return jsonify(client=name, membership_end=client["membership_end"], **state)

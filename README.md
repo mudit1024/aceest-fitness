@@ -1,6 +1,6 @@
 # ACEest Fitness & Gym
 
-[![CI](https://github.com/<your-github-username>/aceest-fitness/actions/workflows/main.yml/badge.svg)](https://github.com/<your-github-username>/aceest-fitness/actions/workflows/main.yml)
+[![CI](https://github.com/mudit1024/aceest-fitness/actions/workflows/main.yml/badge.svg)](https://github.com/mudit1024/aceest-fitness/actions/workflows/main.yml)
 
 A Flask REST API for gym client management: training programmes, calorie
 estimates, client records, BMI, memberships, weekly adherence, workouts and
@@ -97,7 +97,7 @@ curl -X POST localhost:5000/clients/Arjun/workouts -H "Content-Type: application
 Prerequisites: Python 3.11+ and Git. Docker is optional.
 
 ```bash
-git clone https://github.com/<your-github-username>/aceest-fitness.git
+git clone https://github.com/mudit1024/aceest-fitness.git
 cd aceest-fitness
 
 python -m venv .venv

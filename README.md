@@ -2,6 +2,12 @@
 
 [![CI](https://github.com/mudit1024/aceest-fitness/actions/workflows/main.yml/badge.svg)](https://github.com/mudit1024/aceest-fitness/actions/workflows/main.yml)
 
+| | |
+|---|---|
+| **Submitted by** | Mudit Kumar Bhatnagar |
+| **BITS ID** | 2025TM93024 |
+| **Course** | Introduction to DevOps (CSIZG514 / SEZG514) - Assignment 1 |
+
 A Flask REST API for gym client management: training programmes, calorie
 estimates, client records, BMI, memberships, weekly adherence, workouts and
 body metrics. It ships with a Pytest suite (100% line coverage), a

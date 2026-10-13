@@ -274,3 +274,6 @@ in plain text.
 | `v2.0.0` | SQLite client management, BMI, membership |
 | `v3.0.0` | Progress, workout and metrics tracking, login, programme generator |
 | `v3.1.0` | Docker image, GitHub Actions and Jenkins pipelines, documentation |
+
+
+
